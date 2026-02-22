@@ -1,7 +1,13 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response  
 from . models import Person
+from rest_framework.views import APIView
 from .serializers import PersonSerializer
+
+
+# class persons(APIView):
+#     def get(self,request):
+#         return Response({'message':'this is get'})
 
 @api_view(['GET','POST','PUT','PATCH','DELETE'])
 def home(request):
