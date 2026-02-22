@@ -1,12 +1,17 @@
 from rest_framework import serializers
 from .models import Person, Color
+from .models import Person, Color
 
 class ColorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Color
         fields = ["id", "color_name"]
+        model = Color
+        fields = ["id", "color_name"]
 
 class PersonSerializer(serializers.ModelSerializer):
+    color = ColorSerializer(allow_null=True)
+
     color = ColorSerializer(allow_null=True)
 
     class Meta:
@@ -16,7 +21,6 @@ class PersonSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         color_data = validated_data.pop("color", None)
 
-        # Update person fields first
         for key, value in validated_data.items():
             setattr(instance, key, value)
         instance.save()
