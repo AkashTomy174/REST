@@ -1,39 +1,46 @@
 from rest_framework import serializers
 from .models import Person, Color
-from .models import Person, Color
 
 class ColorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Color
         fields = ["id", "color_name"]
-        model = Color
-        fields = ["id", "color_name"]
+
 
 class PersonSerializer(serializers.ModelSerializer):
-    color = ColorSerializer(allow_null=True)
-
-    color = ColorSerializer(allow_null=True)
+    color = ColorSerializer()  
 
     class Meta:
         model = Person
         fields = "__all__"
 
+    def create(self, validated_data):
+        color_data = validated_data.pop("color")
+
+
+        color = Color.objects.create(**color_data)
+
+        
+        person = Person.objects.create(color=color, **validated_data)
+        return person
+
     def update(self, instance, validated_data):
         color_data = validated_data.pop("color", None)
 
-        for key, value in validated_data.items():
-            setattr(instance, key, value)
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
         instance.save()
 
     
         if color_data:
-            color_serializer = self.fields["color"]
-
             if instance.color:
-                color_serializer.update(instance.color, color_data)
+                for key, value in color_data.items():
+                    setattr(instance.color, key, value)
+                instance.color.save()
             else:
-                new_color = Color.objects.create(**color_data)
-                instance.color = new_color
+                color = Color.objects.create(**color_data)
+                instance.color = color
                 instance.save()
 
         return instance

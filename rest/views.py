@@ -5,9 +5,43 @@ from rest_framework.views import APIView
 from .serializers import PersonSerializer
 
 
-# class persons(APIView):
-#     def get(self,request):
-#         return Response({'message':'this is get'})
+class persons(APIView):
+    def get(self,request):
+        obj=Person.objects.all()
+        serializer=PersonSerializer(obj,many=True)
+        return Response(serializer.data)
+ 
+
+    def post(self,request):
+        data=request.data
+        serializer=PersonSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors)
+    def put(self,request):
+        data=request.data
+        obj=Person.objects.get(id=data['id'])
+        serializer=PersonSerializer(obj,data=data,partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors)
+    def patch(self,request):
+        data=request.data
+        obj=Person.objects.get(id=data['id'])
+        serializer=PersonSerializer(obj,data=data,partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors)
+    def delete(self,request):
+        data=request.data
+        obj=Person.objects.get(id=data['id'])
+        obj.delete()
+        return Response({'message':'person deleted'})
+     
+
 
 @api_view(['GET','POST','PUT','PATCH','DELETE'])
 def home(request):
